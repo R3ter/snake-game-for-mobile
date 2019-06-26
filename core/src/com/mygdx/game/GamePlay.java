@@ -25,6 +25,7 @@ public class GamePlay implements Screen {
     private ArrayList<String> turns,moving;
     private Random rand;
     private int steps=5;
+    private boolean dontdraw;
     private String dir="",moveto="";
     private SpriteBatch batch;
     int num=0;
@@ -36,12 +37,12 @@ public class GamePlay implements Screen {
         turns=new ArrayList<String>();
         moving=new ArrayList<String>();
         array=new ArrayList<Point>();
-        for(int i=0; i<5; i++){
+        for(int i=0; i<20; i++){
             array.add(new Point(x,y));
             moving.add("");
         }
     }
-    private TextureRegion head,body,headup,bodyup;
+    private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
     @Override
     public void show() {
         cam = new OrthographicCamera(500,250);
@@ -50,8 +51,15 @@ public class GamePlay implements Screen {
 
         head=new TextureRegion(new Texture("snake.png"),253 ,0,67,61);
         headup=new TextureRegion(new Texture("snake.png"),187 ,0,67,61);
-        corner=new TextureRegion(new Texture("snake.png"),102 ,0,85,95);
-        body=new TextureRegion(new Texture("snake.png"),67 ,0,67,61);
+
+        corner=new TextureRegion(new Texture("snake.png"),90 ,202,56,54);
+
+        foodtex=new TextureRegion(new Texture("snake.png"),0 ,190,62,66);
+
+        tailup=new TextureRegion(new Texture("snake.png"),195 ,128,56,64);
+        tail=new TextureRegion(new Texture("snake.png"),259 ,128,56,64);
+
+        body=new TextureRegion(new Texture("snake.png"),66 ,0,56,63);
         bodyup=new TextureRegion(new Texture("snake.png"),125 ,61,67,68);
 
         rand=new Random();
@@ -63,7 +71,7 @@ public class GamePlay implements Screen {
         cam.update();
         batch.setProjectionMatrix(cam.combined);
         batch.begin();
-        batch.draw(head,food.x,food.y,20,20);
+        batch.draw(foodtex,food.x,food.y,20,20);
         batch.end();
             if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)&&
         !dir.equals("right")){
@@ -79,14 +87,6 @@ public class GamePlay implements Screen {
             dir="down";
         }
         if(time>5) {
-            for(int i=0; i<turn.size(); i++){
-                if(turn.get(i)>0)
-                    turn.set(i,turn.get(i)-1);
-                else{
-                    turn.remove(i);
-                    turns.remove(i);
-                }
-            }
             if (array.size() > 1) {
                 array.remove(0);
                 moving.remove(0);
@@ -94,7 +94,7 @@ public class GamePlay implements Screen {
         }
             if(x==food.x&&y==food.y){
                 for(int i=0;i<5; i++){
-                    array.add(new Point(x,y));
+                    array.add(new Point(-100,-100));
                     moving.add(moveto);
                 }
                 food=new Point(rand.nextInt(25)*20,rand.nextInt(10)*20);
@@ -138,7 +138,11 @@ public class GamePlay implements Screen {
             array.add(new Point(x, y));
         }
 
-
+            for(int i=0; i<turn.size(); i++){
+                batch.begin();
+                batch.draw(corner,turn.get(i).x,turn.get(i).y, 20, 20);
+                batch.end();
+            }
             for(int i=0; i<array.size(); i++) {
                 if (i == array.size()-1) {
                     batch.begin();
@@ -147,9 +151,47 @@ public class GamePlay implements Screen {
                     else
                         batch.draw(head, array.get(i).x, array.get(i).y, 20, 20);
                     batch.end();
-                } else{
-                    if(turn.contains(i)){
-                        num=i;
+                }else if(i==0){
+                    batch.begin();
+
+                    if(array.get(0).x<array.get(1).x){
+                        if(tail.isFlipX())
+                            tail.flip(true,false);
+                        batch.draw(tail, array.get(i).x, array.get(i).y, 20, 20);
+                    }
+                    else if(array.get(0).x>array.get(1).x){
+                        if(!tail.isFlipX())
+                            tail.flip(true,false);
+                        batch.draw(tail, array.get(i).x, array.get(i).y, 20, 20);
+                    }
+                    else if(array.get(0).y<array.get(1).y){
+                        if(tailup.isFlipY())
+                            tailup.flip(false,true);
+                        batch.draw(tailup, array.get(i).x, array.get(i).y, 20, 20);
+                    }
+                    else{
+                        if(!tailup.isFlipY())
+                            tailup.flip(false,true);
+                        batch.draw(tailup, array.get(i).x, array.get(i).y, 20, 20);
+                    }
+                    batch.end();
+                } else if(!(i+3>array.size()&&i-3<array.size())){
+
+                    dontdraw=false;
+                    System.out.println(turn.size());
+                    for(int f=0; f<turn.size(); f++){
+                        if((turn.get(f).x+10>array.get(i).x&&
+                                turn.get(f).x-10<array.get(i).x)&&(
+                                turn.get(f).y+10>array.get(i).y&&
+                                        turn.get(f).y-10<array.get(i).y
+                                )){
+                            System.out.println(x);
+                            dontdraw=true;
+                            break;
+                        }
+                    }
+
+                    if(dontdraw){
                             if(turns.get(getbyvalue(i)).equals("right,down")){
                                 if(!corner.isFlipX())
                                 corner.flip(true,false);
@@ -163,26 +205,30 @@ public class GamePlay implements Screen {
                                 if(!corner.isFlipX())
                                     corner.flip(true,false);
                             }
-                            batch.begin();
-                                batch.draw(corner,array.get(i).x,array.get(i).y, 0, 0);
-                            batch.end();
+//                            batch.begin();
+//                                batch.draw(corner,array.get(i).x,array.get(i).y, 20, 20);
+//                            batch.end();
                         }else {
-                        System.out.println(num);
                                 if(moving.size()>0&&moving.get(i).equals("up")||moving.get(i).equals("down")){
                                 batch.begin();
-                                batch.draw(bodyup, array.get(i).x, array.get(i).y, 20, 5);
+                                batch.draw(bodyup, array.get(i).x, array.get(i).y, 20, 20);
                                 batch.end();
                             }else{
                             batch.begin();
-                            batch.draw(body, array.get(i).x, array.get(i).y, 5, 20);
+                            batch.draw(body, array.get(i).x, array.get(i).y, 20, 20);
                             batch.end();
                             }
+                                if(num>0)
                                 num=num-1;
                             }
 
                         }
 
                 }
+            if(turn.size()>0&&(turn.get(0).x==array.get(0).x
+            &&turn.get(0).y==array.get(0).y)){
+                turn.remove(0);
+            }
 
         time++;
     }
