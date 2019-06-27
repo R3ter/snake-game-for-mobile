@@ -1,4 +1,4 @@
-package com.mygdx.game.desktop;
+package com.mygdx.game;
 
 import com.badlogic.gdx.input.GestureDetector;
 
@@ -17,7 +17,7 @@ public class SimpleDirectionGestureDetector extends GestureDetector {
         super(new DirectionGestureListener(directionListener));
     }
 
-    private static class DirectionGestureListener extends GestureAdapter{
+    private static class DirectionGestureListener extends GestureDetector.GestureAdapter {
         DirectionListener directionListener;
 
         public DirectionGestureListener(DirectionListener directionListener){

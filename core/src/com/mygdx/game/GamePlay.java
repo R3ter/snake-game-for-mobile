@@ -2,6 +2,7 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -9,7 +10,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.desktop.SimpleDirectionGestureDetector;
+
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -22,41 +24,47 @@ public class GamePlay implements Screen {
     private Vector2 food;
     private int time=0;
     private ArrayList<Vector2> turn,wall;
-    private ArrayList<String> turns;
     private Random rand;
-    private int steps=10;
+    private int steps=10,score=0;
     private boolean pause=false;
     private boolean dontdraw;
     private String dir="",moveto="";
     private SpriteBatch batch;
+    private Texture texture;
+    InputMultiplexer inputMultiplexer;
 
+    private GameStage gamestage;
 
     private OrthographicCamera cam;
     GamePlay(SpriteBatch batch){
         this.batch=batch;
         turn=new ArrayList<Vector2>();
-        turns=new ArrayList<String>();
-
             wall=new ArrayList<Vector2>();
 
         array=new ArrayList<Vector2>();
-        for(int i=0; i<20; i++){
-//            array.add(new Vector2(-10,-10));
+        for(int i=0; i<4; i++){
+            array.add(new Vector2(-10,-10));
 
         }
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
     private Texture background,wallimg;
+
+
+
     @Override
     public void show() {
 
         cam = new OrthographicCamera(500,260);
+
+
         cam.position.set(new Vector2(500/2f,260/2f),1);
         cam.update();
 
 
         for (int i=0; i<26; i++){
             wall.add(new Vector2(i*20,0));
+            wall.add(new Vector2(i*20,220));
             wall.add(new Vector2(i*20,240));
         }
         for (int i=0; i<13; i++) {
@@ -65,18 +73,20 @@ public class GamePlay implements Screen {
         }
 
         background = new Texture("background.png");
-        head=new TextureRegion(new Texture("snake.png"),253 ,0,67,61);
-        headup=new TextureRegion(new Texture("snake.png"),187 ,0,67,61);
 
-        corner=new TextureRegion(new Texture("snake.png"),90 ,202,56,54);
+        texture=new Texture("snake.png");
+        head=new TextureRegion(texture,253 ,0,67,61);
+        headup=new TextureRegion(texture,187 ,0,67,61);
 
-        foodtex=new TextureRegion(new Texture("snake.png"),0 ,190,62,66);
+        corner=new TextureRegion(texture,90 ,202,56,54);
 
-        tailup=new TextureRegion(new Texture("snake.png"),195 ,128,56,64);
-        tail=new TextureRegion(new Texture("snake.png"),259 ,128,56,64);
+        foodtex=new TextureRegion(texture,0 ,190,62,66);
 
-        body=new TextureRegion(new Texture("snake.png"),66 ,0,56,63);
-        bodyup=new TextureRegion(new Texture("snake.png"),125 ,61,67,68);
+        tailup=new TextureRegion(texture,195 ,128,56,64);
+        tail=new TextureRegion(texture,259 ,128,56,64);
+
+        body=new TextureRegion(texture,66 ,0,56,63);
+        bodyup=new TextureRegion(texture,125 ,61,67,68);
 
 
         Pixmap pixel=new Pixmap(20,20, Pixmap.Format.RGB565);
@@ -90,23 +100,28 @@ public class GamePlay implements Screen {
         rand=new Random();
         food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
 
+
         Cotroll();
+        gamestage=new GameStage(batch,2,this);
     }
 
     @Override
     public void render(float delta) {
         cam.update();
         batch.setProjectionMatrix(cam.combined);
-
         draw();
+        gamestage.drawstage(score);
+
 
         for (Vector2 v:wall){
-            if(v.x==x&&v.y==y)
-                System.out.println("loser");
+            if(v.x==x&&v.y==y&&
+                    !moveto.equals(""))
+                pause=true;
         }
         for(int i=0; i<array.size(); i++){
-            if((x==array.get(i).x&&y==array.get(i).y&&(i!=array.size()-1)))
-                System.out.println("loser");
+            if((x==array.get(i).x&&y==array.get(i).y&&(i!=array.size()-1))&&
+                !moveto.equals(""))
+                pause=true;
         }
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
@@ -157,7 +172,6 @@ public class GamePlay implements Screen {
                     }
                 }
                 if(time>5){
-                    turns.add(moveto+","+dir);
                     moveto=dir;
                     turn.add(new Vector2(x,y));
 
@@ -187,15 +201,15 @@ public class GamePlay implements Screen {
         }
 
 
-
-
         if(x==food.x&&y==food.y){
-
-            for(int i=0;i<3; i++){
+            for(int i=0; i<20; i++)
             array.add(0,new Vector2(0,0));
-            }
             food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
+            score=score+1;
         }
+        if(array.contains(food))
+            food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
+
         if(!pause)
         time++;
     }
@@ -279,9 +293,13 @@ public class GamePlay implements Screen {
             batch.end();
         }
     }
+    public void stop(){
+        pause=!pause;
+    }
     private void Cotroll(){
+        inputMultiplexer = new InputMultiplexer();
 
-        Gdx.input.setInputProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
+        inputMultiplexer.addProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
             @Override
             public void onLeft() {
             if(!dir.equals("right")){
@@ -306,17 +324,20 @@ public class GamePlay implements Screen {
                     if(!dir.equals("up")){
                         dir="down";
             }}
-            }));
+
+        }));
+
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
     }
 
     @Override
     public void resize(int width, int height) {
-
     }
 
     @Override
     public void pause() {
-
+        pause=true;
     }
 
     @Override
@@ -326,11 +347,12 @@ public class GamePlay implements Screen {
 
     @Override
     public void hide() {
-
+        pause=true;
     }
 
     @Override
     public void dispose() {
-
+        background.dispose();
+        texture.dispose();
     }
 }
