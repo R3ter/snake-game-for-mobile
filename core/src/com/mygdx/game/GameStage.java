@@ -1,7 +1,6 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -30,7 +29,7 @@ public class GameStage {
         img =new Texture(Gdx.files.internal("stage.png"));
         Texture texture=new Texture("snake.png");
         TextureRegion foodtex=new TextureRegion(texture,0 ,190,62,66);
-        Image pause=new Image(new TextureRegion(texture,73 ,126,43,57));
+        final Image pause=new Image(new TextureRegion(texture,73 ,126,43,57));
 
 
 
@@ -66,12 +65,15 @@ public class GameStage {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
 
                 main.stop();
-
+                pressed(pause);
                 return true;
             }
         });
     }
 
+    void pressed(Image image){
+            image.setColor(0,0,1,1);
+    }
     public void drawstage(int score){
         label.setText(" : "+score);
         stage.act();

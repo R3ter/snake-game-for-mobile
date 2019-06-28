@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -14,6 +16,7 @@ import com.badlogic.gdx.math.Vector2;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Timer;
 
 
 public class GamePlay implements Screen {
@@ -30,13 +33,16 @@ public class GamePlay implements Screen {
     private boolean dontdraw;
     private String dir="",moveto="";
     private SpriteBatch batch;
+    private boolean start=false;
     private Texture texture;
     InputMultiplexer inputMultiplexer;
-
+    private AssetManager manager;
     private GameStage gamestage;
-
+    MyGdxGame game;
     private OrthographicCamera cam;
-    GamePlay(SpriteBatch batch){
+    GamePlay(SpriteBatch batch, AssetManager manager,MyGdxGame game){
+        this.game=game;
+        this.manager=manager;
         this.batch=batch;
         turn=new ArrayList<Vector2>();
             wall=new ArrayList<Vector2>();
@@ -44,24 +50,22 @@ public class GamePlay implements Screen {
         array=new ArrayList<Vector2>();
         for(int i=0; i<4; i++){
             array.add(new Vector2(-10,-10));
-
         }
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
-    private Texture background,wallimg;
+    private Texture background,wallimg,waitimg;
+    private Sprite loadingimg;
 
 
 
     @Override
     public void show() {
 
+
+
         cam = new OrthographicCamera(500,260);
-
-
         cam.position.set(new Vector2(500/2f,260/2f),1);
         cam.update();
-
-
         for (int i=0; i<26; i++){
             wall.add(new Vector2(i*20,0));
             wall.add(new Vector2(i*20,220));
@@ -72,21 +76,10 @@ public class GamePlay implements Screen {
             wall.add(new Vector2(480,20*i));
         }
 
-        background = new Texture("background.png");
 
-        texture=new Texture("snake.png");
-        head=new TextureRegion(texture,253 ,0,67,61);
-        headup=new TextureRegion(texture,187 ,0,67,61);
 
-        corner=new TextureRegion(texture,90 ,202,56,54);
 
-        foodtex=new TextureRegion(texture,0 ,190,62,66);
 
-        tailup=new TextureRegion(texture,195 ,128,56,64);
-        tail=new TextureRegion(texture,259 ,128,56,64);
-
-        body=new TextureRegion(texture,66 ,0,56,63);
-        bodyup=new TextureRegion(texture,125 ,61,67,68);
 
 
         Pixmap pixel=new Pixmap(20,20, Pixmap.Format.RGB565);
@@ -103,14 +96,88 @@ public class GamePlay implements Screen {
 
         Cotroll();
         gamestage=new GameStage(batch,2,this);
+        loadingimg=new Sprite(manager.get("loading.png",Texture.class));
+
     }
 
+    private void initimages(){
+
+        background = manager.get("background.png",Texture.class);
+        texture=manager.get("snake.png",Texture.class);
+
+
+        head=new TextureRegion(texture,253 ,0,67,61);
+        headup=new TextureRegion(texture,187 ,0,67,61);
+
+        corner=new TextureRegion(texture,90 ,202,56,54);
+
+        foodtex=new TextureRegion(texture,0 ,190,62,66);
+
+        tailup=new TextureRegion(texture,195 ,128,56,64);
+        tail=new TextureRegion(texture,259 ,128,56,64);
+
+        body=new TextureRegion(texture,66 ,0,56,63);
+        bodyup=new TextureRegion(texture,125 ,61,67,68);
+    }
+    private boolean loadtexture(String texture){
+        try{
+            manager.get(texture);
+            return false;
+        }catch (Exception l){
+            manager.load(texture,Texture.class);
+            manager.update();
+            return true;
+        }
+    }
+    private void load(){
+        try{
+//            manager.get("image3.jpg");
+            initimages();
+            game.loading=false;
+            manager.finishLoading();
+        }catch (Exception e){
+            if(loadtexture("background.png")){
+                return;
+            }else if(loadtexture("snake.png")){
+                return;
+            }else if(loadtexture("image.jpg")){
+                return;
+            }else if(loadtexture("image2.jpg")){
+                return;
+            }else if(loadtexture("image3.jpg")){
+                return;
+            }
+
+
+        }
+    }
+    private void loading(){
+        pause=true;
+        start=false;
+        batch.begin();
+        batch.draw(loadingimg,0,0,40/2f,26/2f,40,26
+                ,1,1,alfa);
+        batch.end();
+
+    }
+    private float alfa;
     @Override
     public void render(float delta) {
+        alfa=7+alfa;
+        if(game.loading){
+           loading();
+           load();
+        }
+        else{
+            draw();
+            gamestage.drawstage(score);
+            pause=false;
+            start=true;
+        }
+
         cam.update();
         batch.setProjectionMatrix(cam.combined);
-        draw();
-        gamestage.drawstage(score);
+
 
 
         for (Vector2 v:wall){
@@ -212,6 +279,7 @@ public class GamePlay implements Screen {
 
         if(!pause)
         time++;
+
     }
 
 
@@ -298,36 +366,35 @@ public class GamePlay implements Screen {
     }
     private void Cotroll(){
         inputMultiplexer = new InputMultiplexer();
-
         inputMultiplexer.addProcessor(new SimpleDirectionGestureDetector(new SimpleDirectionGestureDetector.DirectionListener() {
             @Override
             public void onLeft() {
-            if(!dir.equals("right")){
+            if(!dir.equals("right")&&start){
                 dir="left";
             }
             }
 
             @Override
             public void onRight() {
-                if(!dir.equals("left")){
+                if(!dir.equals("left")&&start){
                     dir="right";
             }}
 
             @Override
             public void onUp() {
-                    if(!dir.equals("down")){
+                    if(!dir.equals("down")&&start){
                         dir="up";
             }}
 
             @Override
             public void onDown() {
-                    if(!dir.equals("up")){
+                    if(!dir.equals("up")&&start){
                         dir="down";
             }}
 
         }));
 
-        Gdx.input.setInputProcessor(inputMultiplexer);
+                Gdx.input.setInputProcessor(inputMultiplexer);
 
     }
 
