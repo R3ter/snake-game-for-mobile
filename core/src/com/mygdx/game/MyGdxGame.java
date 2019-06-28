@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.game.Levels.Level1;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -32,7 +33,7 @@ public class MyGdxGame extends Game {
 		manager.finishLoading();
 
 
-		this.setScreen(new GamePlay(batch,manager,this));
+		this.setScreen(new Level1(batch,manager,this));
 	}
 
 	@Override

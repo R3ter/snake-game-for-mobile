@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.mygdx.game.Screens.GamePlay;
 
 
 public class GameStage {
@@ -40,7 +41,7 @@ public class GameStage {
 //        Gdx.input.setInputProcessor(main.inputMultiplexer);
 
         BitmapFont font=new BitmapFont();
-         label=new Label(" : "+0+"",new Label.LabelStyle(font, Color.BLACK));
+         label=new Label(" : "+score+"",new Label.LabelStyle(font, Color.BLACK));
         Table table=new Table();
 
 

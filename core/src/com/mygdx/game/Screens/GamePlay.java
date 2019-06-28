@@ -1,4 +1,4 @@
-package com.mygdx.game;
+package com.mygdx.game.Screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -12,56 +12,66 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.GameStage;
+import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.SimpleDirectionGestureDetector;
 
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.Timer;
 
 
 public class GamePlay implements Screen {
-   private TextureRegion corner;
-   private ArrayList<Vector2> array;
-    private int x=20;
-    private int y=20;
+    private TextureRegion corner;
+    private ArrayList<Vector2> array;
+    protected int x=20;
+    protected int y=20;
     private Vector2 food;
-    private int time=0;
+    protected float time=0;
     private ArrayList<Vector2> turn,wall;
     private Random rand;
-    private int steps=10,score=0;
-    private boolean pause=false;
+    protected int steps=10,score;
+    protected boolean pause=false;
     private boolean dontdraw;
     private String dir="",moveto="";
-    private SpriteBatch batch;
-    private boolean start=false;
+    protected boolean start=false;
     private Texture texture;
-    InputMultiplexer inputMultiplexer;
-    private AssetManager manager;
+    public InputMultiplexer inputMultiplexer;
     private GameStage gamestage;
-    MyGdxGame game;
     private OrthographicCamera cam;
-    GamePlay(SpriteBatch batch, AssetManager manager,MyGdxGame game){
+
+    protected AssetManager manager;
+    protected SpriteBatch batch;
+    protected MyGdxGame game;
+   public GamePlay(SpriteBatch batch, AssetManager manager,MyGdxGame game){
+       super();
         this.game=game;
         this.manager=manager;
         this.batch=batch;
-        turn=new ArrayList<Vector2>();
-            wall=new ArrayList<Vector2>();
 
-        array=new ArrayList<Vector2>();
-        for(int i=0; i<4; i++){
-            array.add(new Vector2(-10,-10));
-        }
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
-    private Texture background,wallimg,waitimg;
+    private Texture wallimg,waitimg;
+    protected Texture background;
     private Sprite loadingimg;
-
+    protected boolean loading=true;
 
 
     @Override
     public void show() {
+        loading=true;
+        start=false;
+        dir="";
+        moveto="";
+        score=0;
+        turn=new ArrayList<Vector2>();
+        wall=new ArrayList<Vector2>();
 
+        array=new ArrayList<Vector2>();
 
+        for(int i=0; i<4; i++){
+            array.add(new Vector2(-10,-10));
+        }
 
         cam = new OrthographicCamera(500,260);
         cam.position.set(new Vector2(500/2f,260/2f),1);
@@ -76,16 +86,9 @@ public class GamePlay implements Screen {
             wall.add(new Vector2(480,20*i));
         }
 
-
-
-
-
-
-
         Pixmap pixel=new Pixmap(20,20, Pixmap.Format.RGB565);
         pixel.setColor(0,.5f,0,1);
         pixel.fillRectangle(0,0,20,20);
-
 
         wallimg = new Texture(pixel);
 
@@ -100,59 +103,48 @@ public class GamePlay implements Screen {
 
     }
 
-    private void initimages(){
+    protected void initimages(){
 
         background = manager.get("background.png",Texture.class);
         texture=manager.get("snake.png",Texture.class);
-
-
         head=new TextureRegion(texture,253 ,0,67,61);
         headup=new TextureRegion(texture,187 ,0,67,61);
-
         corner=new TextureRegion(texture,90 ,202,56,54);
-
         foodtex=new TextureRegion(texture,0 ,190,62,66);
-
         tailup=new TextureRegion(texture,195 ,128,56,64);
         tail=new TextureRegion(texture,259 ,128,56,64);
-
         body=new TextureRegion(texture,66 ,0,56,63);
         bodyup=new TextureRegion(texture,125 ,61,67,68);
+
+
     }
     private boolean loadtexture(String texture){
         try{
             manager.get(texture);
             return false;
         }catch (Exception l){
+            System.out.println(l);
             manager.load(texture,Texture.class);
             manager.update();
             return true;
         }
     }
-    private void load(){
+    protected boolean load(String text){
         try{
-//            manager.get("image3.jpg");
             initimages();
-            game.loading=false;
+            loading=false;
             manager.finishLoading();
+            return true;
         }catch (Exception e){
-            if(loadtexture("background.png")){
-                return;
-            }else if(loadtexture("snake.png")){
-                return;
-            }else if(loadtexture("image.jpg")){
-                return;
-            }else if(loadtexture("image2.jpg")){
-                return;
-            }else if(loadtexture("image3.jpg")){
-                return;
+            if(loadtexture(text)){
+                return false;
             }
 
-
         }
+        return false;
+
     }
     private void loading(){
-        pause=true;
         start=false;
         batch.begin();
         batch.draw(loadingimg,0,0,40/2f,26/2f,40,26
@@ -161,127 +153,140 @@ public class GamePlay implements Screen {
 
     }
     private float alfa;
+
     @Override
     public void render(float delta) {
         alfa=7+alfa;
-        if(game.loading){
-           loading();
-           load();
-        }
-        else{
-            draw();
-            gamestage.drawstage(score);
-            pause=false;
-            start=true;
-        }
-
         cam.update();
         batch.setProjectionMatrix(cam.combined);
 
-
-
-        for (Vector2 v:wall){
-            if(v.x==x&&v.y==y&&
-                    !moveto.equals(""))
-                pause=true;
-        }
-        for(int i=0; i<array.size(); i++){
-            if((x==array.get(i).x&&y==array.get(i).y&&(i!=array.size()-1))&&
-                !moveto.equals(""))
-                pause=true;
-        }
-
-        if(Gdx.input.isKeyJustPressed(Input.Keys.P)){
-           pause=!pause;
-        }
-            if(Gdx.input.isKeyJustPressed(Input.Keys.LEFT)&&
-        !dir.equals("right")){
-            dir="left";
-        }else if(Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)&&
-                !dir.equals("left")){
-            dir="right";
-        }else if(Gdx.input.isKeyJustPressed(Input.Keys.UP) &&
-                !dir.equals("down")){
-            dir="up";
-        }else if(Gdx.input.isKeyJustPressed(Input.Keys.DOWN)&&
-                !dir.equals("up")){
-            dir="down";
-        }
-
-
-        if(time>5) {
-            if (array.size() > 1) {
-                array.remove(0);
-
+        if(loading){
+            if(load("snake.png")) {
+                return;
             }
+            if (load("background.png")) {
+                return;
+            }
+            loading();
         }
-        if(x%20==0&&y%20==0){
-            if(!moveto.equals(dir)){
-                if(dir.equals("up")){
-                    if(headup.isFlipY()) {
-                        headup.flip(false,true);
+        else {
+            draw();
+            gamestage.drawstage(score);
+//            pause=false;
+            start = true;
+
+
+            for (Vector2 v : wall) {
+                if (v.x == x && v.y == y &&
+                        !moveto.equals(""))
+                    pause = true;
+            }
+            for (int i = 0; i < array.size(); i++) {
+                if ((x == array.get(i).x && y == array.get(i).y && (i != array.size() - 1)) &&
+                        !moveto.equals(""))
+                    pause = true;
+            }
+
+
+            //keyboard controller
+            if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
+                pause = !pause;
+            }
+            if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) &&
+                    !dir.equals("right") && start) {
+                dir = "left";
+            } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) &&
+                    !dir.equals("left") && start) {
+                dir = "right";
+            } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP) &&
+                    !dir.equals("down") && start) {
+                dir = "up";
+            } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN) &&
+                    !dir.equals("up") && start) {
+                dir = "down";
+            }
+            ////////////
+
+
+            if (time > 5) {
+                if (array.size() > 1) {
+                    array.remove(0);
+
+                }
+            }
+            if (x % 20 == 0 && y % 20 == 0) {
+                if (!moveto.equals(dir)) {
+                    if (dir.equals("up")) {
+                        if (headup.isFlipY()) {
+                            headup.flip(false, true);
+                        }
+                    }
+                    if (dir.equals("down")) {
+                        if (!headup.isFlipY()) {
+                            headup.flip(false, true);
+                        }
+                    }
+
+                    if (dir.equals("right")) {
+                        if (head.isFlipX()) {
+                            head.flip(true, false);
+                        }
+                    }
+                    if (dir.equals("left")) {
+                        if (!head.isFlipX()) {
+                            head.flip(true, false);
+                        }
+                    }
+                    if (time > 5) {
+                        moveto = dir;
+                        turn.add(new Vector2(x, y));
+
                     }
                 }
-                if(dir.equals("down")){
-                    if(!headup.isFlipY()) {
-                        headup.flip(false,true);
-                    }
-                }
+            }
 
-                if(dir.equals("right")){
-                    if(head.isFlipX()) {
-                        head.flip(true,false);
-                    }
+            if (time > 5) {
+                if (moveto.equals("right")) {
+                    x = x + steps;
+                } else if (moveto.equals("up")) {
+                    y = y + steps;
+                } else if (moveto.equals("left")) {
+                    x = x - steps;
+                } else if (moveto.equals("down")) {
+                    y = y - steps;
                 }
-                if(dir.equals("left")){
-                    if(!head.isFlipX()) {
-                        head.flip(true,false);
-                    }
-                }
-                if(time>5){
-                    moveto=dir;
-                    turn.add(new Vector2(x,y));
+                time = 0;
+                array.add(new Vector2(x, y));
 
+//                if (turn.size() > 0 && (turn.get(0).x == array.get(0).x
+//                        && turn.get(0).y == array.get(0).y)) {
+//                    turn.remove(0);
+//                }
+
+
+                if(turn.size()>0&&!array.contains(turn.get(0))){
+                    turn.remove(0);
                 }
 
 
             }
-        }
 
-        if(time>5) {
-            if (moveto.equals("right")) {
-                x=x+steps;
-            } else if (moveto.equals("up")) {
-                y = y + steps;
-            } else if (moveto.equals("left")) {
-                x = x - steps;
-            } else if (moveto.equals("down")) {
-                y = y - steps;
+            if (x == food.x && y == food.y) {
+                for (int i = 0; i < 20; i++)
+                    array.add(0, new Vector2(0, 0));
+                food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+                score = score + 1;
             }
-            time=0;
-            array.add(new Vector2(x, y));
-
-            if(turn.size()>0&&(turn.get(0).x==array.get(0).x
-                    &&turn.get(0).y==array.get(0).y)){
-                turn.remove(0);
-            }
+            if (array.contains(food))
+                food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
         }
-
-
-        if(x==food.x&&y==food.y){
-            for(int i=0; i<20; i++)
-            array.add(0,new Vector2(0,0));
-            food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
-            score=score+1;
-        }
-        if(array.contains(food))
-            food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
-
-        if(!pause)
-        time++;
-
     }
 
+    protected void movesnake(float f){
+        if(!pause&&start)
+            time=time+f;
+
+    }
 
     private void draw(){
         batch.begin();
@@ -361,6 +366,7 @@ public class GamePlay implements Screen {
             batch.end();
         }
     }
+
     public void stop(){
         pause=!pause;
     }
@@ -419,7 +425,6 @@ public class GamePlay implements Screen {
 
     @Override
     public void dispose() {
-        background.dispose();
         texture.dispose();
     }
 }
