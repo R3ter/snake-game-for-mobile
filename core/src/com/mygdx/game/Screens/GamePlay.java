@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameStage;
+import com.mygdx.game.Levels.Level1;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.SimpleDirectionGestureDetector;
 
@@ -42,12 +43,15 @@ public class GamePlay implements Screen {
 
     protected AssetManager manager;
     protected SpriteBatch batch;
+    int level;
     protected MyGdxGame game;
    public GamePlay(SpriteBatch batch, AssetManager manager,MyGdxGame game){
        super();
+       this.level=level;
         this.game=game;
         this.manager=manager;
         this.batch=batch;
+
 
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
@@ -64,6 +68,9 @@ public class GamePlay implements Screen {
         dir="";
         moveto="";
         score=0;
+
+
+
         turn=new ArrayList<Vector2>();
         wall=new ArrayList<Vector2>();
 
@@ -87,7 +94,7 @@ public class GamePlay implements Screen {
         }
 
         Pixmap pixel=new Pixmap(20,20, Pixmap.Format.RGB565);
-        pixel.setColor(0,.5f,0,1);
+        pixel.setColor(0,.6f,.4f,1f);
         pixel.fillRectangle(0,0,20,20);
 
         wallimg = new Texture(pixel);
@@ -148,15 +155,15 @@ public class GamePlay implements Screen {
         start=false;
         batch.begin();
         batch.draw(loadingimg,0,0,40/2f,26/2f,40,26
-                ,1,1,alfa);
+                ,1,1,alpha);
         batch.end();
 
     }
-    private float alfa;
+    private float alpha;
 
     @Override
     public void render(float delta) {
-        alfa=7+alfa;
+        alpha=7+alpha;
         cam.update();
         batch.setProjectionMatrix(cam.combined);
 
@@ -189,6 +196,9 @@ public class GamePlay implements Screen {
 
 
             //keyboard controller
+            if(dir.equals("")&&Gdx.input.justTouched()){
+                dir="right";
+            }
             if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
                 pause = !pause;
             }
@@ -272,7 +282,7 @@ public class GamePlay implements Screen {
             }
 
             if (x == food.x && y == food.y) {
-                for (int i = 0; i < 20; i++)
+                for (int i = 0; i < 3; i++)
                     array.add(0, new Vector2(0, 0));
                 food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
                 score = score + 1;
@@ -345,6 +355,9 @@ public class GamePlay implements Screen {
                         dontdraw=true;
                         break;
                     }
+                }
+                if(steps<=5&&i+3>array.size()&&i-1<array.size()){
+                    dontdraw=true;
                 }
                 if(!dontdraw) {
                     if(array.get(i).x==array.get(i+1).x){

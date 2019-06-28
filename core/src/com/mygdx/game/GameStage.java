@@ -57,7 +57,7 @@ public class GameStage {
         table.add(label);
         stage.addActor(table);
 //        stage.getViewport().update(500,260, true);
-        stage.setDebugAll(true);
+//        stage.setDebugAll(true);
 
         main.inputMultiplexer.addProcessor(stage);
 

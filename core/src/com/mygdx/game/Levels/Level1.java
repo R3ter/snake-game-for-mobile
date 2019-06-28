@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Screens.Start;
 
 
 public class Level1 extends GamePlay {
@@ -16,7 +17,7 @@ SpriteBatch batch;
     @Override
     public void show() {
         super.show();
-
+        steps=5;
 
     }
 int f=0;
@@ -28,10 +29,9 @@ int f=0;
             load("image3.jpg");
         }else {
             f=f+1;
-            if(f>500){
-                dispos();
-                game.setScreen(new Level2(batch,manager,game));
-            }
+//            if(f>500){
+////                dispos();
+//            }
         }
     }
 
@@ -44,6 +44,7 @@ int f=0;
     @Override
     protected void initimages() {
         super.initimages();
+        manager.get("image3.jpg");
     }
 
 
