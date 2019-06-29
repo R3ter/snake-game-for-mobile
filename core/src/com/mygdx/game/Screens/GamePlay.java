@@ -5,12 +5,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.game.GameStage;
 import com.mygdx.game.Levels.Level1;
@@ -29,9 +32,10 @@ public class GamePlay implements Screen {
     protected int y=20;
     private Vector2 food;
     protected float time=0;
-    private ArrayList<Vector2> turn,wall;
+    private ArrayList<Vector2> turn;
+    protected ArrayList<Vector2> wall;
     private Random rand;
-    protected int steps=10,score;
+    protected int steps=10,score,grow=2;
     protected boolean pause=false;
     private boolean dontdraw;
     private String dir="",moveto="";
@@ -39,8 +43,8 @@ public class GamePlay implements Screen {
     private Texture texture;
     public InputMultiplexer inputMultiplexer;
     private GameStage gamestage;
-    private OrthographicCamera cam;
-
+    protected OrthographicCamera cam;
+    protected boolean drawbackground=true;
     protected AssetManager manager;
     protected SpriteBatch batch;
     int level;
@@ -55,7 +59,7 @@ public class GamePlay implements Screen {
 
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
-    private Texture wallimg,waitimg;
+    protected Texture wallimg;
     protected Texture background;
     private Sprite loadingimg;
     protected boolean loading=true;
@@ -69,6 +73,7 @@ public class GamePlay implements Screen {
         moveto="";
         score=0;
 
+        manager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 
 
         turn=new ArrayList<Vector2>();
@@ -125,25 +130,29 @@ public class GamePlay implements Screen {
 
 
     }
-    private boolean loadtexture(String texture){
+    private boolean loadtexture(String texture, Class classname){
         try{
             manager.get(texture);
             return false;
         }catch (Exception l){
             System.out.println(l);
-            manager.load(texture,Texture.class);
+            manager.load(texture,classname);
             manager.update();
             return true;
         }
     }
-    protected boolean load(String text){
+    protected void loadingfinished(){
+
+    }
+    protected boolean load(String text,Class classname){
         try{
             initimages();
             loading=false;
             manager.finishLoading();
+            loadingfinished();
             return true;
         }catch (Exception e){
-            if(loadtexture(text)){
+            if(loadtexture(text,classname)){
                 return false;
             }
 
@@ -161,6 +170,13 @@ public class GamePlay implements Screen {
     }
     private float alpha;
 
+    protected void drawfirst(){
+        if(drawbackground){
+            batch.begin();
+            batch.draw(background,0,0);
+            batch.end();
+        }
+    }
     @Override
     public void render(float delta) {
         alpha=7+alpha;
@@ -168,15 +184,16 @@ public class GamePlay implements Screen {
         batch.setProjectionMatrix(cam.combined);
 
         if(loading){
-            if(load("snake.png")) {
+            if(load("snake.png",Texture.class)) {
                 return;
             }
-            if (load("background.png")) {
+            if (load("background.png",Texture.class)) {
                 return;
             }
             loading();
         }
         else {
+            drawfirst();
             draw();
             gamestage.drawstage(score);
 //            pause=false;
@@ -282,12 +299,12 @@ public class GamePlay implements Screen {
             }
 
             if (x == food.x && y == food.y) {
-                for (int i = 0; i < 3; i++)
-                    array.add(0, new Vector2(0, 0));
+                for (int i = 0; i < grow; i++)
+                    array.add(0, new Vector2(-20, -20));
                 food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
                 score = score + 1;
             }
-            if (array.contains(food))
+            if (array.contains(food)||wall.contains(food))
                 food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
         }
     }
@@ -300,7 +317,6 @@ public class GamePlay implements Screen {
 
     private void draw(){
         batch.begin();
-        batch.draw(background,0,0);
         batch.draw(foodtex,food.x,food.y,20,20);
         batch.end();
 

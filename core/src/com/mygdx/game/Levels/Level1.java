@@ -1,6 +1,7 @@
 package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.MyGdxGame;
@@ -26,7 +27,7 @@ int f=0;
         super.render(delta);
         movesnake(2);
         if(loading){
-            load("image3.jpg");
+            load("image3.jpg", Texture.class);
         }else {
             f=f+1;
 //            if(f>500){

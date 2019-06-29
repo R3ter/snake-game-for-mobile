@@ -29,14 +29,12 @@ public class GameStage {
     public GameStage(Batch batch, int score, final GamePlay main){
         this.score=score;
         this.batch=batch;
-        img =new Texture(Gdx.files.internal("stage.png"));
         Texture texture=new Texture("snake.png");
         TextureRegion foodtex=new TextureRegion(texture,0 ,190,62,66);
         final Image pause=new Image(new TextureRegion(texture,73 ,126,43,57));
 
 
 
-        Image im=new Image(img);
         stage = new Stage(new StretchViewport(500,260),batch);
 
 
