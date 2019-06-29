@@ -1,0 +1,26 @@
+
+buttons.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+clickedlevel
+  rotate: false
+  xy: 1, 503
+  size: 500, 500
+  orig: 500, 500
+  offset: 0, 0
+  index: -1
+level
+  rotate: false
+  xy: 1, 1
+  size: 500, 500
+  orig: 500, 500
+  offset: 0, 0
+  index: -1
+lock
+  rotate: false
+  xy: 503, 559
+  size: 306, 444
+  orig: 306, 444
+  offset: 0, 0
+  index: -1

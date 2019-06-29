@@ -8,18 +8,22 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Levels.Level1;
 import com.mygdx.game.MyGdxGame;
 
 
+import java.awt.Font;
 import java.util.ArrayList;
 
 public class Start implements Screen {
@@ -58,24 +62,36 @@ public class Start implements Screen {
         for(int i=0; i<50; i++){
             list.add(new Vector2(100,i*64));
         }
+
+
+
     }
     private void createUI(){
         stage=new Stage(viewport);
-        Image buttonimage=new Image(button);
-        Image arcade=new Image(manager.get("buttons/arcade.png",Texture.class));
-        Image settings=new Image(manager.get("buttons/settings.png",Texture.class));
+
+        Skin skin=new Skin(Gdx.files.internal("fonts/skin.json"),
+                manager.get("buttons/newbuttons/buttons.atlas", TextureAtlas.class));
+
+        TextButton start=new TextButton("Start game",skin);
+        TextButton arcade=new TextButton("Arcade",skin);
+        TextButton button=new TextButton("waleed",skin);
+
+
         final Table table=new Table();
         table.top();
         table.add().size(300,0);
-        table.add(buttonimage).size(350,70);
+        table.add(start).size(450,140);
         table.row();
         table.add().size(300,200);
-        table.add(arcade).size(350,70);
+        table.add(arcade).size(450,140);
         table.add().size(10,100);
         table.row();
         table.add().size(300,0);
 
-        table.add(settings).size(350,70);
+        table.add(button).size(450,140);
+
+
+
 //        table.add().size(10,100);
 
         table.add().size(10,170);
@@ -100,11 +116,14 @@ public class Start implements Screen {
             }
         });
 
-        buttonimage.addListener(new InputListener(){
+        start.addListener(new InputListener(){
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 dispos();
                 game.setScreen(new Level1(batch,manager,game));
+            }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
@@ -138,17 +157,19 @@ public class Start implements Screen {
         batch.setProjectionMatrix(cam.combined);
 
         if(loading){
-            if (load("start.jpg")) {
+            if (load("start.jpg",Texture.class)) {
                 return;
-            }if (load("snake.png")) {
+            }if (load("snake.png",Texture.class)) {
                 return;
-            }if (load("buttons/startbutton.png")) {
+            }if (load("buttons/startbutton.png",Texture.class)) {
                 return;
-            }if (load("buttons/selectlevels.png")) {
+            }if (load("buttons/selectlevels.png",Texture.class)) {
                 return;
-            }if (load("buttons/arcade.png")) {
+            }if (load("buttons/arcade.png",Texture.class)) {
                 return;
-            }if (load("buttons/settings.png")) {
+            }if (load("buttons/settings.png",Texture.class)) {
+                return;
+            }if (load("buttons/newbuttons/buttons.atlas",TextureAtlas.class)) {
                 return;
             }
             loading();
@@ -183,24 +204,25 @@ public class Start implements Screen {
 //        manager.get("buttons/selectlevels.png");
         manager.get("buttons/settings.png");
         manager.get("buttons/arcade.png");
+        manager.get("buttons/newbuttons/buttons.atlas");
 
         apple=new Image(new TextureRegion(main,0,190,59,66));
 //        apple.setBounds(350,400,100,100);
 
 
     }
-    private boolean loadtexture(String texture){
+    private boolean loadtexture(String texture,Class classname){
         try{
             manager.get(texture);
             return false;
         }catch (Exception l){
             System.out.println(l);
-            manager.load(texture,Texture.class);
+            manager.load(texture,classname);
             manager.update();
             return true;
         }
     }
-    private boolean load(String text){
+    private boolean load(String text,Class classname){
         try{
             initimages();
             createUI();
@@ -208,7 +230,7 @@ public class Start implements Screen {
             manager.finishLoading();
             return true;
         }catch (Exception e){
-            if(loadtexture(text)){
+            if(loadtexture(text,classname)){
                 return false;
             }
 

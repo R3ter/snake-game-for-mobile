@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -40,8 +42,13 @@ public class GameStage {
 
 //        Gdx.input.setInputProcessor(main.inputMultiplexer);
 
-        BitmapFont font=new BitmapFont();
-         label=new Label(" : "+score+"",new Label.LabelStyle(font, Color.BLACK));
+        Skin skin=new Skin(Gdx.files.internal("fonts/skin.json"),
+                new TextureAtlas("buttons/newbuttons/buttons.atlas"));
+
+//        skin.getFont("default").getData().setScale(.5f);
+
+        label=new Label( " : "+score+"",skin,"default");
+        label.setFontScale(.5f);
         Table table=new Table();
 
 
@@ -54,7 +61,7 @@ public class GameStage {
         table.add().size(150,20).right();
         table.add(new Image(foodtex)).size(20,20);
 //        table.add(im);
-        table.add(label);
+        table.add(label).bottom();
         stage.addActor(table);
 //        stage.getViewport().update(500,260, true);
 //        stage.setDebugAll(true);

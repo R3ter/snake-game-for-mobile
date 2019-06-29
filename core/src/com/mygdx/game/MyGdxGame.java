@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.game.Screens.Levels;
-import com.mygdx.game.Screens.Start;
 
 public class MyGdxGame extends Game {
 	private SpriteBatch batch;
