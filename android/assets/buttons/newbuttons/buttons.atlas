@@ -3,23 +3,98 @@ buttons.png
 format: RGBA8888
 filter: Nearest,Nearest
 repeat: none
-clickedlevel
+Untitled-1
+  rotate: false
+  xy: 1, 336
+  size: 1236, 744
+  orig: 1236, 744
+  offset: 0, 0
+  index: -1
+arcade
+  rotate: false
+  xy: 1, 244
+  size: 472, 90
+  orig: 472, 90
+  offset: 0, 0
+  index: -1
+selectlevels
+  rotate: false
+  xy: 1239, 999
+  size: 403, 81
+  orig: 403, 81
+  offset: 0, 0
+  index: -1
+startbutton
+  rotate: false
+  xy: 1, 152
+  size: 391, 90
+  orig: 391, 90
+  offset: 0, 0
+  index: -1
+main
+  rotate: false
+  xy: 1239, 848
+  size: 286, 149
+  orig: 286, 149
+  offset: 0, 0
+  index: -1
+nextbutton
+  rotate: false
+  xy: 1, 1
+  size: 286, 149
+  orig: 286, 149
+  offset: 0, 0
+  index: -1
+restart
+  rotate: false
+  xy: 1239, 697
+  size: 286, 149
+  orig: 286, 149
+  offset: 0, 0
+  index: -1
+settings
+  rotate: false
+  xy: 475, 244
+  size: 289, 90
+  orig: 289, 90
+  offset: 0, 0
+  index: -1
+
+buttons2.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+newbuttons/dialog2
+  rotate: false
+  xy: 1, 1017
+  size: 1528, 1974
+  orig: 1528, 1974
+  offset: 0, 0
+  index: -1
+newbuttons/font
   rotate: false
   xy: 1, 503
+  size: 512, 512
+  orig: 512, 512
+  offset: 0, 0
+  index: -1
+newbuttons/clickedlevel
+  rotate: false
+  xy: 1531, 2491
   size: 500, 500
   orig: 500, 500
   offset: 0, 0
   index: -1
-level
+newbuttons/level
   rotate: false
   xy: 1, 1
   size: 500, 500
   orig: 500, 500
   offset: 0, 0
   index: -1
-lock
+newbuttons/lock
   rotate: false
-  xy: 503, 559
+  xy: 515, 571
   size: 306, 444
   orig: 306, 444
   offset: 0, 0

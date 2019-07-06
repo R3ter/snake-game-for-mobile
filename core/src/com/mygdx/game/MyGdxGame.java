@@ -7,7 +7,8 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.game.Levels.Level2;
+import com.mygdx.game.Screens.Start;
+import com.mygdx.game.Screens.WinScreen;
 
 
 public class MyGdxGame extends Game {
@@ -21,9 +22,10 @@ public class MyGdxGame extends Game {
 		batch = new SpriteBatch();
 		manager = new AssetManager();
 		manager.load("loading.png", Texture.class);
+
 		manager.finishLoading();
 
-		this.setScreen(new Level2(batch,manager,this));
+		this.setScreen(new Start(batch,manager,this));
 	}
 
 	@Override

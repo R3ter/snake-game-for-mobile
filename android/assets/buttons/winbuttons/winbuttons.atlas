@@ -1,0 +1,26 @@
+
+winbuttons.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+home
+  rotate: false
+  xy: 1, 1
+  size: 88, 87
+  orig: 88, 87
+  offset: 0, 0
+  index: -1
+next
+  rotate: false
+  xy: 91, 1
+  size: 88, 87
+  orig: 88, 87
+  offset: 0, 0
+  index: -1
+restart
+  rotate: false
+  xy: 181, 1
+  size: 88, 87
+  orig: 88, 87
+  offset: 0, 0
+  index: -1

@@ -22,7 +22,7 @@ public class LevelsHandler implements Screen {
     @Override
     public void show() {
         if(level==1){
-            game.setScreen(new Level1(batch,manager,game));
+            game.setScreen(new Level1(batch,manager,game,1));
         }else{
             game.setScreen(new Start(batch,manager,game));
         }

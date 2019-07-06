@@ -1,0 +1,7 @@
+{
+com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
+    default: { up: home ,down: home},
+    next:{up:next,down:next},
+    restart:{up:restart,down:restart}
+  }
+}

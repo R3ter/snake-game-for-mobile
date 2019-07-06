@@ -9,16 +9,19 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.game.GameStage;
-import com.mygdx.game.Levels.Level1;
+import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.Stages.GameStage;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.SimpleDirectionGestureDetector;
+import com.mygdx.game.Stages.WinStage;
 
 
 import java.util.ArrayList;
@@ -27,10 +30,10 @@ import java.util.Random;
 
 public class GamePlay implements Screen {
     private TextureRegion corner;
-    private ArrayList<Vector2> array;
+    private ArrayList<Vector2> array,perv;
     protected int x=20;
     protected int y=20;
-    private Vector2 food;
+    protected Vector2 food;
     protected float time=0;
     private ArrayList<Vector2> turn;
     protected ArrayList<Vector2> wall;
@@ -45,6 +48,8 @@ public class GamePlay implements Screen {
     private GameStage gamestage;
     protected OrthographicCamera cam;
     protected boolean drawbackground=true;
+    private boolean hit=false;
+    private boolean win=false;
     protected AssetManager manager;
     protected SpriteBatch batch;
     int level;
@@ -59,11 +64,34 @@ public class GamePlay implements Screen {
 
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
-    protected Texture wallimg;
+    protected Texture wallimg,apple;
     protected Texture background;
     private Sprite loadingimg;
     protected boolean loading=true;
 
+    private void restart(){
+
+        start=false;
+        dir="";
+        moveto="";
+        score=0;
+        x=20;y=20;
+
+        turn.clear();
+        perv.clear();
+        array.clear();
+
+        for(int i=0; i<4; i++){
+            array.add(new Vector2(-20,-20));
+        }
+
+        array.add(new Vector2(20,20));
+
+        food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
+
+
+
+    }
 
     @Override
     public void show() {
@@ -73,21 +101,27 @@ public class GamePlay implements Screen {
         moveto="";
         score=0;
 
+
         manager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
 
 
         turn=new ArrayList<Vector2>();
         wall=new ArrayList<Vector2>();
+        perv=new ArrayList<Vector2>();
 
         array=new ArrayList<Vector2>();
 
         for(int i=0; i<4; i++){
-            array.add(new Vector2(-10,-10));
+            array.add(new Vector2(-20,-20));
         }
 
         cam = new OrthographicCamera(500,260);
         cam.position.set(new Vector2(500/2f,260/2f),1);
         cam.update();
+
+
+
+
         for (int i=0; i<26; i++){
             wall.add(new Vector2(i*20,0));
             wall.add(new Vector2(i*20,220));
@@ -114,19 +148,41 @@ public class GamePlay implements Screen {
         loadingimg=new Sprite(manager.get("loading.png",Texture.class));
 
     }
+    Animation<TextureRegion> animation;
+    Animation<TextureRegion> animation2,animation3;
 
     protected void initimages(){
 
         background = manager.get("background.png",Texture.class);
-        texture=manager.get("snake.png",Texture.class);
-        head=new TextureRegion(texture,253 ,0,67,61);
-        headup=new TextureRegion(texture,187 ,0,67,61);
-        corner=new TextureRegion(texture,90 ,202,56,54);
+        texture=manager.get("snake2.png",Texture.class);
+        apple=manager.get("apple/newapple/apple.png",Texture.class);
+
+       TextureAtlas textureAtlas = manager.get("apple/newapple/apple.atlas");
+
+        TextureAtlas textureRegions=manager.get("apple/newapple/applestill.atlas");
+
+
+        animation = new Animation<TextureRegion>(5/15f, textureAtlas.getRegions());
+        animation2 = new Animation<TextureRegion>(5/15f,textureRegions.getRegions());
+
+        Array<TextureRegion> textureRegions1=new Array<TextureRegion>();
+        textureRegions1.add(textureAtlas.getRegions().get(textureAtlas.getRegions().size-1));
+        textureRegions1.add(textureAtlas.getRegions().get(textureAtlas.getRegions().size-2));
+
+        animation3 = new Animation<TextureRegion>(5/15f,textureRegions1);
+
+        head=new TextureRegion(texture,297 ,0,203,168);
+        headup=new TextureRegion(texture,24 ,291,168,203);
+
+        corner=new TextureRegion(texture,283 ,355,203,168);
+
         foodtex=new TextureRegion(texture,0 ,190,62,66);
-        tailup=new TextureRegion(texture,195 ,128,56,64);
-        tail=new TextureRegion(texture,259 ,128,56,64);
-        body=new TextureRegion(texture,66 ,0,56,63);
-        bodyup=new TextureRegion(texture,125 ,61,67,68);
+
+        tailup=new TextureRegion(texture,24 ,88,168,203);
+        tail=new TextureRegion(texture,220 ,194,203,168);
+
+        body=new TextureRegion(texture,260 ,194,203,168);
+        bodyup=new TextureRegion(texture,24 ,42,168,203);
 
 
     }
@@ -140,6 +196,7 @@ public class GamePlay implements Screen {
             manager.update();
             return true;
         }
+
     }
     protected void loadingfinished(){
 
@@ -152,6 +209,7 @@ public class GamePlay implements Screen {
             loadingfinished();
             return true;
         }catch (Exception e){
+            System.out.println(e);
             if(loadtexture(text,classname)){
                 return false;
             }
@@ -177,6 +235,7 @@ public class GamePlay implements Screen {
             batch.end();
         }
     }
+    int num=0;
     @Override
     public void render(float delta) {
         alpha=7+alpha;
@@ -186,8 +245,15 @@ public class GamePlay implements Screen {
         if(loading){
             if(load("snake.png",Texture.class)) {
                 return;
+            } if(load("snake2.png",Texture.class)) {
+                return;
             }
             if (load("background.png",Texture.class)) {
+                return;
+            }if (load("apple/newapple/apple.atlas",TextureAtlas.class)) {
+                return;
+            }
+            if (load("apple/newapple/applestill.atlas",TextureAtlas.class)) {
                 return;
             }
             loading();
@@ -195,118 +261,190 @@ public class GamePlay implements Screen {
         else {
             drawfirst();
             draw();
+
+
             gamestage.drawstage(score);
-//            pause=false;
             start = true;
 
 
-            for (Vector2 v : wall) {
-                if (v.x == x && v.y == y &&
-                        !moveto.equals(""))
-                    pause = true;
-            }
-            for (int i = 0; i < array.size(); i++) {
-                if ((x == array.get(i).x && y == array.get(i).y && (i != array.size() - 1)) &&
-                        !moveto.equals(""))
-                    pause = true;
-            }
-
 
             //keyboard controller
-            if(dir.equals("")&&Gdx.input.justTouched()){
-                dir="right";
-            }
+
             if (Gdx.input.isKeyJustPressed(Input.Keys.P)) {
                 pause = !pause;
             }
             if (Gdx.input.isKeyJustPressed(Input.Keys.LEFT) &&
-                    !dir.equals("right") && start) {
+                    !moveto.equals("right") && start) {
                 dir = "left";
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.RIGHT) &&
-                    !dir.equals("left") && start) {
+                    !moveto.equals("left") && start) {
                 dir = "right";
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.UP) &&
-                    !dir.equals("down") && start) {
+                    !moveto.equals("down") && start) {
                 dir = "up";
             } else if (Gdx.input.isKeyJustPressed(Input.Keys.DOWN) &&
-                    !dir.equals("up") && start) {
+                    !moveto.equals("up") && start) {
                 dir = "down";
             }
             ////////////
 
 
-            if (time > 5) {
+            if (time > 5&&!hit&&start) {
                 if (array.size() > 1) {
                     array.remove(0);
-
                 }
-            }
-            if (x % 20 == 0 && y % 20 == 0) {
-                if (!moveto.equals(dir)) {
-                    if (dir.equals("up")) {
-                        if (headup.isFlipY()) {
-                            headup.flip(false, true);
+                if (x % 20 == 0 && y % 20 == 0) {
+                    if (!moveto.equals(dir)) {
+                        if (dir.equals("up")) {
+                            if (headup.isFlipY()) {
+                                headup.flip(false, true);
+                            }
                         }
-                    }
-                    if (dir.equals("down")) {
-                        if (!headup.isFlipY()) {
-                            headup.flip(false, true);
+                        if (dir.equals("down")) {
+                            if (!headup.isFlipY()) {
+                                headup.flip(false, true);
+                            }
                         }
-                    }
 
-                    if (dir.equals("right")) {
-                        if (head.isFlipX()) {
-                            head.flip(true, false);
+                        if (dir.equals("right")) {
+                            if (head.isFlipX()) {
+                                head.flip(true, false);
+                            }
                         }
-                    }
-                    if (dir.equals("left")) {
-                        if (!head.isFlipX()) {
-                            head.flip(true, false);
+                        if (dir.equals("left")) {
+                            if (!head.isFlipX()) {
+                                head.flip(true, false);
+                            }
                         }
-                    }
-                    if (time > 5) {
-                        moveto = dir;
+                        if (time > 5) {
+                            moveto = dir;
                         turn.add(new Vector2(x, y));
 
+                        }
                     }
                 }
             }
 
+
+
+
             if (time > 5) {
-                if (moveto.equals("right")) {
-                    x = x + steps;
-                } else if (moveto.equals("up")) {
-                    y = y + steps;
-                } else if (moveto.equals("left")) {
-                    x = x - steps;
-                } else if (moveto.equals("down")) {
-                    y = y - steps;
+
+
+                if(!hit){
+                    if(turn.size()>0&&!array.contains(turn.get(0))){
+                        turn.remove(0);
+                    }
+                    if(x!=array.get(array.size()-1).x&&
+                            y!=array.get(array.size()-1).y){
+                        turn.add(array.get(array.size()-1));
+                    }
+                    if (moveto.equals("right")) {
+                        x = x + steps;
+                    } else if (moveto.equals("up")) {
+                        y = y + steps;
+                    } else if (moveto.equals("left")) {
+                        x = x - steps;
+                    } else if (moveto.equals("down")) {
+                        y = y - steps;
+                    }
+                    if(start){
+                        array.add(new Vector2(x, y));
+                        perv.add(new Vector2(x,y));
+                    }
+
                 }
-                time = 0;
-                array.add(new Vector2(x, y));
-
-//                if (turn.size() > 0 && (turn.get(0).x == array.get(0).x
-//                        && turn.get(0).y == array.get(0).y)) {
-//                    turn.remove(0);
-//                }
 
 
-                if(turn.size()>0&&!array.contains(turn.get(0))){
-                    turn.remove(0);
+                if(hit){
+                    hit();
                 }
 
+                if(wall.contains(new Vector2(x,y))){
 
+                    lose();
+
+                    if(perv.size()<20&&!hit){
+                    }else{
+                        hit=true;
+                    }
+                    time = 0;
+                }
             }
 
-            if (x == food.x && y == food.y) {
-                for (int i = 0; i < grow; i++)
-                    array.add(0, new Vector2(-20, -20));
-                food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
-                score = score + 1;
-            }
-            if (array.contains(food)||wall.contains(food))
-                food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+
+            for (int i = 0; i < array.size(); i++) {
+                    if ((x == array.get(i).x && y == array.get(i).y && (i != array.size() - 1)) &&
+                            !moveto.equals(""))
+                        pause = true;
+                }
+                if (x == food.x && y == food.y) {
+                    for (int i = 0; i < grow; i++)
+                        array.add(0, new Vector2(-20, -20));
+                    food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+                    score = score + 1;
+                }
+                if (array.contains(food)||wall.contains(food)) {
+                    food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+                }
+
+                if(perv.size()>array.size()+300){
+                    perv.remove(0);
+                }
         }
+
+
+    }
+
+    private int timer=0;
+    protected void lose(){
+
+        restart();
+    }
+    protected  void  hit(){
+    timer++;
+
+        if(timer>1) {
+            timer=0;
+
+            num++;
+            if (num < 15) {
+                for (int f = 1 ; f <= array.size() ; f++) {
+                    if(perv.size()>f){
+                        Vector2 x =perv.get(perv.size()-f);
+                        array.set(array.size()-f,x);
+                    }else {
+                        perv.clear();
+                        num=0;
+                        hit=false;
+                        y = (int) array.get(array.size() - 1).y;
+                        x = (int) array.get(array.size() - 1).x;
+                    }
+                }
+                if (array.get(array.size() - 1).y > array.get(array.size() - 2).y) {
+                    moveto = "up";
+                    dir = "up";
+                } else if (array.get(array.size() - 1).y < array.get(array.size() - 2).y) {
+                    moveto = "down";
+                    dir = "down";
+                } else if (array.get(array.size() - 1).x > array.get(array.size() - 2).x) {
+                    moveto = "right";
+                    dir = "right";
+                } else {
+                    moveto = "left";
+                    dir = "left";
+                }
+                    if(perv.size()>0)
+                    perv.remove(perv.size()-1);
+            } else {
+                num = 0;
+                hit = false;
+                y = (int) array.get(array.size() - 1).y;
+                x = (int) array.get(array.size() - 1).x;
+                perv.clear();
+            }
+        }
+
     }
 
     protected void movesnake(float f){
@@ -315,10 +453,49 @@ public class GamePlay implements Screen {
 
     }
 
+    private float timers;
+    private float an;
+    private boolean finished=false;
+    protected void drawapple(){
+        if(x+40>food.x&&x-40<food.x&&
+                y+40>food.y&&y-40<food.y){
+            if(finished){
+                batch.begin();
+                batch.draw(animation3.getKeyFrame(an,true),food.x,food.y,20,20);
+                batch.end();
+            }else{
+                batch.begin();
+                batch.draw(animation.getKeyFrame(an/2,false),food.x,food.y,20,20);
+                batch.end();
+            }
+            if(animation.isAnimationFinished(an/2)){
+                finished=true;
+            }
+        }else{
+            finished=false;
+            if(timers>500){
+                batch.begin();
+                batch.draw(animation2.getKeyFrame(an/2,false),food.x,food.y,20,20);
+                batch.end();
+                if(animation2.isAnimationFinished(an/2)){
+                    if(timers>550){
+                        timers=0;
+                        an=0;
+                    }
+                }
+            }else{
+                batch.begin();
+                batch.draw(animation2.getKeyFrame(0,false),food.x,food.y,20,20);
+                batch.end();
+            }
+
+        }
+    }
     private void draw(){
-        batch.begin();
-        batch.draw(foodtex,food.x,food.y,20,20);
-        batch.end();
+        an += Gdx.graphics.getDeltaTime();
+        timers++;
+
+        drawapple();
 
         for(int i=0; i<turn.size(); i++){
             batch.begin();
@@ -363,10 +540,10 @@ public class GamePlay implements Screen {
 
                 dontdraw=false;
                 for(int f=0; f<turn.size(); f++){
-                    if((turn.get(f).x+10>array.get(i).x&&
-                            turn.get(f).x-10<array.get(i).x)&&(
-                            turn.get(f).y+10>array.get(i).y&&
-                                    turn.get(f).y-10<array.get(i).y
+                    if((turn.get(f).x+6>array.get(i).x&&
+                            turn.get(f).x-6<array.get(i).x)&&(
+                            turn.get(f).y+6>array.get(i).y&&
+                                    turn.get(f).y-6<array.get(i).y
                     )){
                         dontdraw=true;
                         break;
@@ -432,6 +609,8 @@ public class GamePlay implements Screen {
                 Gdx.input.setInputProcessor(inputMultiplexer);
 
     }
+
+
 
     @Override
     public void resize(int width, int height) {

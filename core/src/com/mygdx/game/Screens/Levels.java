@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Levels.LevelsHandler;
 import com.mygdx.game.MyGdxGame;
@@ -27,9 +28,9 @@ public class Levels implements Screen {
         private SpriteBatch batch;
         private MyGdxGame game;
         Stage stage;
-
+        Texture background;
         OrthographicCamera cam;
-        StretchViewport viewport;
+        FitViewport viewport;
         boolean loading=true;
         Sprite loadingimg;
 
@@ -44,31 +45,30 @@ public class Levels implements Screen {
         Gdx.input.setInputProcessor(stage);
 
         cam = new OrthographicCamera(1280,720);
-        viewport=new StretchViewport(1280,720,cam);
+        viewport=new FitViewport(1280,720,cam);
         cam.position.set(new Vector2(1280/2f,720/2f),1);
         cam.update();
 
         loadingimg=new Sprite(manager.get("loading.png", Texture.class));
-
     }
 
     private void createUI(){
-        Skin skin=new Skin(Gdx.files.internal("fonts/skin.json"),
-                manager.get("buttons/newbuttons/buttons.atlas", TextureAtlas.class));
+        Skin skin=new Skin(Gdx.files.internal("newassetes/fonts/selectlevel/skin.json"),
+                manager.get("newassetes/asdawdawd.atlas", TextureAtlas.class));
 
         int max=0;
         for(int i=1; i<5; i++){
             for(int f=1; f<5; f++){
                 max++;
-                final int level=max;
+
                 skin.getFont("medium").getData().setScale(.5f);
 //                ImageButton start=new ImageButton(skin,"default");
                 TextButton start=new TextButton(max+"",skin);
-                start.setBounds(f*100,(i*70)+100,100,70);
+                start.setBounds((f*110),(i*80)+20,100,70);
                 start.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                        game.setScreen(new LevelsHandler(batch,manager,game,level));
+//                        game.setScreen(new LevelsHandler(batch,manager,game,level));
                         return true;
                     }
                 });
@@ -83,25 +83,21 @@ int alpha=0;
         cam.update();
         batch.setProjectionMatrix(cam.combined);
 
+
         if(loading){
-            if (load("start.jpg",Texture.class)) {
+            if (load("newassetes/asdawdawd.png",Texture.class)) {
                 return;
-            }if (load("snake.png",Texture.class)) {
+            }if (load("newassetes/asdawdawd.atlas",TextureAtlas.class)) {
                 return;
-            }if (load("buttons/startbutton.png",Texture.class)) {
-                return;
-            }if (load("buttons/selectlevels.png",Texture.class)) {
-                return;
-            }if (load("buttons/arcade.png",Texture.class)) {
-                return;
-            }if (load("buttons/settings.png",Texture.class)) {
-                return;
-            }if (load("buttons/newbuttons/buttons.atlas",TextureAtlas.class)) {
+            }if (load("start.jpg",Texture.class)) {
                 return;
             }
             loading();
         }else{
 
+            batch.begin();
+            batch.draw(background,0,0,1280,720);
+            batch.end();
 
             stage.act();
             stage.draw();
@@ -120,7 +116,9 @@ int alpha=0;
     }
     private void initimages(){
 
-        manager.get("buttons/newbuttons/buttons.atlas");
+        manager.get("newassetes/asdawdawd.atlas");
+        manager.get("newassetes/asdawdawd.png");
+        background=manager.get("start.jpg");
 
 
     }
@@ -143,6 +141,7 @@ int alpha=0;
             manager.finishLoading();
             return true;
         }catch (Exception e){
+            System.out.println(e);
             if(loadtexture(text,classname)){
                 return false;
             }

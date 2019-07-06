@@ -1,0 +1,26 @@
+
+applestill.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+1
+  rotate: false
+  xy: 1, 1
+  size: 144, 156
+  orig: 144, 156
+  offset: 0, 0
+  index: -1
+2
+  rotate: false
+  xy: 147, 1
+  size: 144, 156
+  orig: 144, 156
+  offset: 0, 0
+  index: -1
+3
+  rotate: false
+  xy: 293, 1
+  size: 144, 156
+  orig: 144, 156
+  offset: 0, 0
+  index: -1

@@ -120,14 +120,24 @@ public class Start implements Screen {
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 dispos();
-                game.setScreen(new Level1(batch,manager,game));
+                game.setScreen(new Level1(batch,manager,game,1));
             }
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
             }
         });
-
+        arcade.addListener(new InputListener(){
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                dispos();
+                game.setScreen(new Levels(batch,manager,game));
+            }
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+        });
 
         inputMultiplexer.addProcessor(stage);
         inputMultiplexer.addProcessor(stage1);
@@ -230,6 +240,7 @@ public class Start implements Screen {
             manager.finishLoading();
             return true;
         }catch (Exception e){
+            System.out.print(e);
             if(loadtexture(text,classname)){
                 return false;
             }

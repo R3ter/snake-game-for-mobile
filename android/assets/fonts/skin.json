@@ -9,12 +9,12 @@
   },
   com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
     default: {
-      down: level, up: clickedlevel,
+      down: selectlevels, up: selectlevels,
       font: medium, fontColor: white
     }
   },
   com.badlogic.gdx.scenes.scene2d.ui.ImageButton$ImageButtonStyle: {
-    default: { up: lock, imageChecked: lock }
+    default: { up: selectlevels, imageChecked: selectlevels }
   },
   com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle:{
   default: {
