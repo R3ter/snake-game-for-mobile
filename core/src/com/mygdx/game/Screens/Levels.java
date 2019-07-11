@@ -60,7 +60,7 @@ public class Levels implements Screen {
         for(int i=1; i<5; i++){
             for(int f=1; f<5; f++){
                 max++;
-
+                final int level=max;
                 skin.getFont("medium").getData().setScale(.5f);
 //                ImageButton start=new ImageButton(skin,"default");
                 TextButton start=new TextButton(max+"",skin);
@@ -68,8 +68,12 @@ public class Levels implements Screen {
                 start.addListener(new InputListener(){
                     @Override
                     public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-//                        game.setScreen(new LevelsHandler(batch,manager,game,level));
                         return true;
+                    }
+
+                    @Override
+                    public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                        game.setScreen(new LevelsHandler(batch,manager,game,level));
                     }
                 });
                 stage.addActor(start);

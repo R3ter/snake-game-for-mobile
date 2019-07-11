@@ -2,10 +2,9 @@ package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -31,7 +30,7 @@ public class Level1 extends GamePlay {
     @Override
     public void show() {
         super.show();
-        steps=2;
+        steps=5;
 
         viewport=new StretchViewport(1400,400);
         stage=new Stage(viewport);
@@ -43,7 +42,13 @@ public class Level1 extends GamePlay {
     private void dialog(){
         Skin skin=new Skin(Gdx.files.internal("buttons/dialog/skin.json"),
                 manager.get("buttons/dialog/winbuttons.atlas",TextureAtlas.class));
-        Dialog dialog=new Dialog("title",skin);
+        Dialog dialog=new Dialog("title",skin){
+            @Override
+            protected void result(Object object) {
+                super.result(object);
+                start=true;
+            }
+        };
         ImageButton button=new ImageButton(skin);
         dialog.setBounds(0,0,500,250);
         button.setSize(1,1);
@@ -62,8 +67,7 @@ public class Level1 extends GamePlay {
     @Override
     public void render(float delta) {
         super.render(delta);
-
-        movesnake(2);
+        movesnake(5);
         if(loading){
             if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;

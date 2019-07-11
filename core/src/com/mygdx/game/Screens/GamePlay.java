@@ -30,13 +30,13 @@ import java.util.Random;
 
 public class GamePlay implements Screen {
     private TextureRegion corner;
-    private ArrayList<Vector2> array,perv;
+    protected ArrayList<Vector2> array,perv;
     protected int x=20;
     protected int y=20;
-    protected Vector2 food;
+    public static Vector2 food;
     protected float time=0;
     private ArrayList<Vector2> turn;
-    protected ArrayList<Vector2> wall;
+    public static ArrayList<Vector2> wall;
     private Random rand;
     protected int steps=10,score,grow=2;
     protected boolean pause=false;
@@ -49,6 +49,7 @@ public class GamePlay implements Screen {
     protected OrthographicCamera cam;
     protected boolean drawbackground=true;
     private boolean hit=false;
+    public static ArrayList<Vector2> rocks;
     private boolean win=false;
     protected AssetManager manager;
     protected SpriteBatch batch;
@@ -60,7 +61,7 @@ public class GamePlay implements Screen {
         this.game=game;
         this.manager=manager;
         this.batch=batch;
-
+        rocks=new ArrayList<Vector2>();
 
     }
     private TextureRegion head,body,headup,bodyup,tail,tailup,foodtex;
@@ -69,9 +70,9 @@ public class GamePlay implements Screen {
     private Sprite loadingimg;
     protected boolean loading=true;
 
-    private void restart(){
+    protected void restart(){
 
-        start=false;
+
         dir="";
         moveto="";
         score=0;
@@ -86,9 +87,6 @@ public class GamePlay implements Screen {
         }
 
         array.add(new Vector2(20,20));
-
-        food=new Vector2((rand.nextInt(23)+1)*20,(rand.nextInt(8)+1)*20);
-
 
 
     }
@@ -256,6 +254,7 @@ public class GamePlay implements Screen {
             if (load("apple/newapple/applestill.atlas",TextureAtlas.class)) {
                 return;
             }
+
             loading();
         }
         else {
@@ -264,7 +263,6 @@ public class GamePlay implements Screen {
 
 
             gamestage.drawstage(score);
-            start = true;
 
 
 
@@ -289,7 +287,7 @@ public class GamePlay implements Screen {
             ////////////
 
 
-            if (time > 5&&!hit&&start) {
+            if ((time > 5&&!hit)&&start) {
                 if (array.size() > 1) {
                     array.remove(0);
                 }
@@ -325,12 +323,8 @@ public class GamePlay implements Screen {
                 }
             }
 
-
-
-
-            if (time > 5) {
-
-
+             if (time > 5) {
+                time=0;
                 if(!hit){
                     if(turn.size()>0&&!array.contains(turn.get(0))){
                         turn.remove(0);
@@ -352,15 +346,12 @@ public class GamePlay implements Screen {
                         array.add(new Vector2(x, y));
                         perv.add(new Vector2(x,y));
                     }
-
                 }
-
-
                 if(hit){
                     hit();
                 }
-
-                if(wall.contains(new Vector2(x,y))){
+                if(wall.contains(new Vector2(x,y))||
+                rocks.contains(new Vector2(x,y))){
 
                     lose();
 
@@ -368,7 +359,6 @@ public class GamePlay implements Screen {
                     }else{
                         hit=true;
                     }
-                    time = 0;
                 }
             }
 
@@ -384,7 +374,7 @@ public class GamePlay implements Screen {
                     food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
                     score = score + 1;
                 }
-                if (array.contains(food)||wall.contains(food)) {
+                if (array.contains(food)||wall.contains(food)||rocks.contains(food)) {
                     food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
                 }
 

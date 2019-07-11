@@ -2,7 +2,6 @@ package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -19,40 +18,44 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
-import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.Screens.WinScreen;
+import com.mygdx.game.enemies.Snake;
 
-
-public class Level2 extends GamePlay {
-    public Level2(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level){
-        super(batch,manager,game);
+public class Level3 extends GamePlay {
+    public Level3(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level) {
+        super(batch, manager, game);
         this.level=level;
     }
+
     private OrthogonalTiledMapRenderer renderer;
     private StretchViewport viewport;
     private Stage stage;
+    private Snake evilsnake;
     private TiledMap map;
     private int level;
     private Texture rock;
     @Override
     public void show() {
         super.show();
-         drawbackground=true;
-         steps=5;
-         viewport=new StretchViewport(1400,400);
-         stage=new Stage(viewport);
+        drawbackground=true;
+        steps=5;
+        viewport=new StretchViewport(1400,400);
+        stage=new Stage(viewport);
 
-         viewport.apply();
-         inputMultiplexer.addProcessor(stage);
+        viewport.apply();
+        inputMultiplexer.addProcessor(stage);
+
+        evilsnake=new Snake(batch,manager,array);
+
     }
 
     @Override
     protected void loadingfinished() {
         super.loadingfinished();
-
-
-
+        for(int i=0;i<100;i++)
+        array.add(new Vector2(0,0));
         renderer=new OrthogonalTiledMapRenderer(map);
         MapLayer layer= map.getLayers().get(2);
         MapObjects objects=layer.getObjects();
@@ -78,17 +81,23 @@ public class Level2 extends GamePlay {
         super.render(delta);
         if(loading){
             if(load("background2.png", Texture.class)){
-               return;
-           }else if(load("maps/level2.tmx",TiledMap.class)){
+                return;
+            }else if(load("maps/level3.tmx",TiledMap.class)){
                 return;
             }else if(load("objects/rock.png",Texture.class)){
                 return;
-            }if(load("buttons/dialog/winbuttons.atlas",TextureAtlas.class)){
+            }if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;
             }
+            evilsnake.load();
         }else{
             movesnake(5);
+            if (evilsnake.array.contains(array.get(array.size()-1))){
+                restart();
+            }
 
+            if(start)
+                evilsnake.render();
 
             stage.act(delta);
             stage.draw();
@@ -106,8 +115,9 @@ public class Level2 extends GamePlay {
     @Override
     protected void initimages() {
         super.initimages();
-        map=manager.get("maps/level2.tmx",TiledMap.class);
+        map=manager.get("maps/level3.tmx",TiledMap.class);
         dialog();
+        evilsnake.init();
     }
 
     private void dialog(){
@@ -125,7 +135,8 @@ public class Level2 extends GamePlay {
         button.setSize(1,1);
         dialog.add().height(20);
         dialog.row();
-        Label label=new Label("eat 20 apples",skin);
+        Label label=new Label("eat 20 apples \n" +
+                " beware of the other snake",skin);
 
         dialog.text(label).pad(100);
         dialog.button(button);

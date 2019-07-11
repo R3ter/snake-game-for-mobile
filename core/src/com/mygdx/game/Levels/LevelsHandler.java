@@ -23,7 +23,11 @@ public class LevelsHandler implements Screen {
     public void show() {
         if(level==1){
             game.setScreen(new Level1(batch,manager,game,1));
-        }else{
+        }else if(level==2){
+            game.setScreen(new Level2(batch,manager,game,2));
+        }else if(level==3){
+            game.setScreen(new Level3(batch,manager,game,3));
+        }else {
             game.setScreen(new Start(batch,manager,game));
         }
     }
