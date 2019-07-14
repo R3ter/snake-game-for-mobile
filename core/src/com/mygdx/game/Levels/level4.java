@@ -2,7 +2,6 @@ package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
@@ -11,7 +10,6 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -23,28 +21,44 @@ import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.Screens.WinScreen;
 
-public class Level3 extends GamePlay {
-    public Level3(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level) {
+import java.util.Random;
+
+
+public class level4 extends GamePlay {
+
+    public level4(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level) {
         super(batch, manager, game);
         this.level=level;
     }
+    private Random rand;
     private OrthogonalTiledMapRenderer renderer;
     private StretchViewport viewport;
     private Stage stage;
     private TiledMap map;
     private int level;
-    private Texture rock;
+
     @Override
     public void show() {
         super.show();
+        rand=new Random();
         drawbackground=true;
         steps=5;
         viewport=new StretchViewport(1400,400);
         stage=new Stage(viewport);
+        wall.clear();
+
+        for (int i=0; i<13; i++){
+            wall.add(new Vector2(0,i*20));
+            wall.add(new Vector2(34*20,i*20));
+        }
+        for (int i=0; i<35; i++){
+            wall.add(new Vector2(i*20,0));
+            wall.add(new Vector2(i*20,12*20));
+        }
+
 
         viewport.apply();
         inputMultiplexer.addProcessor(stage);
-
 
     }
 
@@ -52,24 +66,17 @@ public class Level3 extends GamePlay {
     protected void loadingfinished() {
         super.loadingfinished();
 
-        dialog();
-
-        renderer=new OrthogonalTiledMapRenderer(map);
+        renderer=new OrthogonalTiledMapRenderer(map,batch);
         MapLayer layer= map.getLayers().get(2);
         MapObjects objects=layer.getObjects();
         grow=2;
-        renderer.setView(cam);
 
-        rock=manager.get("objects/rock.png");
 
         for(MapObject t: objects){
             RectangleMapObject rect = (RectangleMapObject) t;
             rocks.add(new Vector2(rect.getRectangle().x,rect.getRectangle().y));
         }
-
-
     }
-
 
     @Override
     protected void drawfirst() {
@@ -81,33 +88,48 @@ public class Level3 extends GamePlay {
     public void render(float delta) {
         super.render(delta);
         if(loading){
-            if(load("background2.png", Texture.class)){
+            if(load("maps/level4.tmx",TiledMap.class)){
                 return;
-            }else if(load("maps/level3.tmx",TiledMap.class)){
-                return;
-            }else if(load("objects/rock.png",Texture.class)){
-                return;
-            }if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
+            }else if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;
             }
+
         }else{
-            if(start)
             movesnake(2);
 
 
             if(score>=10){
                 game.setScreen(new WinScreen(batch,manager,game,level));
             }
+            if(start){
+                if(x>500/2f&&x<450){
+                    cam.position.set(new Vector2(x,cam.position.y),1);
+                }else if(x<500/2f){
+                    cam.position.set(new Vector2(500/2f,cam.position.y),1);
+                }else if(x>=450){
+                    cam.position.set(new Vector2(450,cam.position.y),1);
+                }
+                cam.update();
 
+            }
+            renderer.setView(cam);
             stage.act(delta);
             stage.draw();
+
         }
+    }
+
+    @Override
+    protected void newfood() {
+        food = new Vector2((rand.nextInt(28) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+
     }
 
     @Override
     protected void initimages() {
         super.initimages();
-        map=manager.get("maps/level3.tmx",TiledMap.class);
+        map=manager.get("maps/level4.tmx",TiledMap.class);
+        dialog();
     }
 
     private void dialog(){

@@ -87,16 +87,11 @@ public class Level2 extends GamePlay {
                 return;
             }
         }else{
-            movesnake(5);
+            movesnake(2);
 
 
             stage.act(delta);
             stage.draw();
-            for(Vector2 v: rocks){
-                batch.begin();
-                batch.draw(rock,v.x,v.y,20,30);
-                batch.end();
-            }
             if(score>=20){
                 game.setScreen(new WinScreen(batch,manager,game,level));
             }

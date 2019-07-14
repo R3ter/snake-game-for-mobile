@@ -89,9 +89,9 @@ public class Snake {
         if(array.contains(food)){
             newfood();
         }
+        controll();
+        dodge();
         if(x%20==0&&y%20==0){
-            controll();
-            dodge();
             changemove();
         }
 
@@ -172,25 +172,25 @@ public class Snake {
         }
     }
     private void dodge(){
-        if (dir.equals("up")&&(array.contains(new Vector2(x,y+20))||
+        if (moveto.equals("up")&&(array.contains(new Vector2(x,y+20))||
                 rocks.contains(new Vector2(x,y+20))||
                 wall.contains(new Vector2(x,y+20))||
                 herosnake.contains(new Vector2(x,y+20)))){
             dir="right";
         }
-        if (dir.equals("down")&&(array.contains(new Vector2(x,y-20))||
+        if (moveto.equals("down")&&(array.contains(new Vector2(x,y-20))||
                 rocks.contains(new Vector2(x,y-20))||
                 wall.contains(new Vector2(x,y-20))||
                 herosnake.contains(new Vector2(x,y-20)))){
-            dir="left";
+                dir="left";
         }
-        if (dir.equals("left")&&(array.contains(new Vector2(x-20,y))||
+        if (moveto.equals("left")&&(array.contains(new Vector2(x-20,y))||
                 rocks.contains(new Vector2(x-20,y))||
                 wall.contains(new Vector2(x-20,y))||
                 herosnake.contains(new Vector2(x-20,y)))){
             dir="up";
         }
-        if (dir.equals("right")&&(array.contains(new Vector2(x+20,y))||
+        if (moveto.equals("right")&&(array.contains(new Vector2(x+20,y))||
                 rocks.contains(new Vector2(x+20,y))||
                 wall.contains(new Vector2(x+20,y))||
                 herosnake.contains(new Vector2(x+20,y)))) {

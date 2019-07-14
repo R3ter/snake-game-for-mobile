@@ -68,6 +68,8 @@ public class GamePlay implements Screen {
     protected Texture wallimg,apple;
     protected Texture background;
     private Sprite loadingimg;
+    private Texture rock;
+
     protected boolean loading=true;
 
     protected void restart(){
@@ -158,6 +160,8 @@ public class GamePlay implements Screen {
        TextureAtlas textureAtlas = manager.get("apple/newapple/apple.atlas");
 
         TextureAtlas textureRegions=manager.get("apple/newapple/applestill.atlas");
+
+        rock=manager.get("objects/rock.png");
 
 
         animation = new Animation<TextureRegion>(5/15f, textureAtlas.getRegions());
@@ -253,6 +257,8 @@ public class GamePlay implements Screen {
             }
             if (load("apple/newapple/applestill.atlas",TextureAtlas.class)) {
                 return;
+            }if(load("objects/rock.png",Texture.class)){
+                return;
             }
 
             loading();
@@ -260,7 +266,11 @@ public class GamePlay implements Screen {
         else {
             drawfirst();
             draw();
-
+            for(Vector2 v: rocks){
+                batch.begin();
+                batch.draw(rock,v.x,v.y,20,30);
+                batch.end();
+            }
 
             gamestage.drawstage(score);
 
@@ -371,11 +381,11 @@ public class GamePlay implements Screen {
                 if (x == food.x && y == food.y) {
                     for (int i = 0; i < grow; i++)
                         array.add(0, new Vector2(-20, -20));
-                    food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+                    newfood();
                     score = score + 1;
                 }
                 if (array.contains(food)||wall.contains(food)||rocks.contains(food)) {
-                    food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+                    newfood();
                 }
 
                 if(perv.size()>array.size()+300){
@@ -385,7 +395,9 @@ public class GamePlay implements Screen {
 
 
     }
-
+    protected void newfood(){
+        food = new Vector2((rand.nextInt(23) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+    }
     private int timer=0;
     protected void lose(){
 

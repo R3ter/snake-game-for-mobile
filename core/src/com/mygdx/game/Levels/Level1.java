@@ -67,7 +67,7 @@ public class Level1 extends GamePlay {
     @Override
     public void render(float delta) {
         super.render(delta);
-        movesnake(5);
+        movesnake(2);
         if(loading){
             if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;

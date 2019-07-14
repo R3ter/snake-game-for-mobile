@@ -11,7 +11,6 @@ import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
@@ -22,15 +21,18 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.Screens.WinScreen;
+import com.mygdx.game.enemies.Snake;
 
-public class Level3 extends GamePlay {
-    public Level3(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level) {
+public class snakelevel extends GamePlay {
+    public snakelevel(SpriteBatch batch, AssetManager manager, MyGdxGame game) {
         super(batch, manager, game);
         this.level=level;
     }
+
     private OrthogonalTiledMapRenderer renderer;
     private StretchViewport viewport;
     private Stage stage;
+    private Snake evilsnake;
     private TiledMap map;
     private int level;
     private Texture rock;
@@ -45,14 +47,13 @@ public class Level3 extends GamePlay {
         viewport.apply();
         inputMultiplexer.addProcessor(stage);
 
+        evilsnake=new Snake(batch,manager,array);
 
     }
 
     @Override
     protected void loadingfinished() {
         super.loadingfinished();
-
-        dialog();
 
         renderer=new OrthogonalTiledMapRenderer(map);
         MapLayer layer= map.getLayers().get(2);
@@ -66,10 +67,7 @@ public class Level3 extends GamePlay {
             RectangleMapObject rect = (RectangleMapObject) t;
             rocks.add(new Vector2(rect.getRectangle().x,rect.getRectangle().y));
         }
-
-
     }
-
 
     @Override
     protected void drawfirst() {
@@ -83,31 +81,44 @@ public class Level3 extends GamePlay {
         if(loading){
             if(load("background2.png", Texture.class)){
                 return;
-            }else if(load("maps/level3.tmx",TiledMap.class)){
+            }else if(load("maps/level4.tmx",TiledMap.class)){
                 return;
             }else if(load("objects/rock.png",Texture.class)){
                 return;
             }if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;
             }
+            evilsnake.load();
         }else{
-            if(start)
             movesnake(2);
+            if (evilsnake.array.contains(array.get(array.size()-1))){
+                restart();
+            }
 
+            if(start){
+                evilsnake.render();
 
-            if(score>=10){
-                game.setScreen(new WinScreen(batch,manager,game,level));
             }
 
             stage.act(delta);
             stage.draw();
+            for(Vector2 v: rocks){
+                batch.begin();
+                batch.draw(rock,v.x,v.y,20,30);
+                batch.end();
+            }
+            if(score>=10){
+                game.setScreen(new WinScreen(batch,manager,game,level));
+            }
         }
     }
 
     @Override
     protected void initimages() {
         super.initimages();
-        map=manager.get("maps/level3.tmx",TiledMap.class);
+        map=manager.get("maps/level4.tmx",TiledMap.class);
+        dialog();
+        evilsnake.init();
     }
 
     private void dialog(){
