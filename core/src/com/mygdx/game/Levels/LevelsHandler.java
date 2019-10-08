@@ -29,6 +29,8 @@ public class LevelsHandler implements Screen {
             game.setScreen(new Level3(batch,manager,game,3));
         }else if(level==4){
             game.setScreen(new level4(batch,manager,game,4));
+        }else if(level==5){
+        game.setScreen(new Level5(batch,manager,game,5));
         }else {
             game.setScreen(new Start(batch,manager,game));
         }

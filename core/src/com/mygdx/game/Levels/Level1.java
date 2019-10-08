@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
@@ -30,8 +29,8 @@ public class Level1 extends GamePlay {
     @Override
     public void show() {
         super.show();
-        steps=5;
-
+        steps=1.5f;
+        wall.clear();
         viewport=new StretchViewport(1400,400);
         stage=new Stage(viewport);
 
@@ -67,7 +66,7 @@ public class Level1 extends GamePlay {
     @Override
     public void render(float delta) {
         super.render(delta);
-        movesnake(2);
+
         if(loading){
             if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;
@@ -97,6 +96,11 @@ public class Level1 extends GamePlay {
         dialog();
     }
 
+    @Override
+    protected void drawfirst() {
+        super.drawfirst();
+
+    }
 
     @Override
     public void resize(int width, int height) {

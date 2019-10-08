@@ -2,6 +2,8 @@ package com.mygdx.game.Levels;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapLayer;
@@ -36,6 +38,7 @@ public class level4 extends GamePlay {
     private Stage stage;
     private TiledMap map;
     private int level;
+    private Sprite applepoint;
 
     @Override
     public void show() {
@@ -92,15 +95,18 @@ public class level4 extends GamePlay {
                 return;
             }else if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;
+            }else if(load("applepoint.png", Texture.class)){
+                return;
             }
 
         }else{
-            movesnake(2);
+
 
 
             if(score>=10){
                 game.setScreen(new WinScreen(batch,manager,game,level));
             }
+
             if(start){
                 if(x>500/2f&&x<450){
                     cam.position.set(new Vector2(x,cam.position.y),1);
@@ -112,6 +118,21 @@ public class level4 extends GamePlay {
                 cam.update();
 
             }
+            if(food.x-(500/2f)>cam.position.x){
+                if(applepoint.isFlipX()){
+                    applepoint.flip(true,false);
+                }
+                batch.begin();
+                batch.draw(applepoint,450,food.y,20,20);
+                batch.end();
+            }else if(food.x+(500/2f)<cam.position.x){
+                if(!applepoint.isFlipX()){
+                    applepoint.flip(true,false);
+                }
+                batch.begin();
+                batch.draw(applepoint,0,food.y,20,20);
+                batch.end();
+            }
             renderer.setView(cam);
             stage.act(delta);
             stage.draw();
@@ -121,7 +142,7 @@ public class level4 extends GamePlay {
 
     @Override
     protected void newfood() {
-        food = new Vector2((rand.nextInt(28) + 1) * 20, (rand.nextInt(8) + 1) * 20);
+        food = new Vector2((rand.nextInt(34) + 1) * 20, (rand.nextInt(8) + 1) * 20);
 
     }
 
@@ -129,6 +150,8 @@ public class level4 extends GamePlay {
     protected void initimages() {
         super.initimages();
         map=manager.get("maps/level4.tmx",TiledMap.class);
+        applepoint=new Sprite(manager.get("applepoint.png",Texture.class));
+
         dialog();
     }
 

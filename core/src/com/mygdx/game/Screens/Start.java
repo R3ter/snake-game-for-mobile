@@ -22,8 +22,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.Levels.Level1;
 import com.mygdx.game.MyGdxGame;
 
-
-import java.awt.Font;
 import java.util.ArrayList;
 
 public class Start implements Screen {
@@ -69,8 +67,8 @@ public class Start implements Screen {
     private void createUI(){
         stage=new Stage(viewport);
 
-        Skin skin=new Skin(Gdx.files.internal("fonts/skin.json"),
-                manager.get("buttons/newbuttons/buttons.atlas", TextureAtlas.class));
+        Skin skin=new Skin(Gdx.files.internal("buttons/startbuttons/skin.json"),
+                manager.get("buttons/startbuttons/startbuttons.atlas", TextureAtlas.class));
 
         TextButton start=new TextButton("Start game",skin);
         TextButton arcade=new TextButton("Arcade",skin);
@@ -148,8 +146,6 @@ public class Start implements Screen {
     private void dispos(){
         manager.unload("start.jpg");
         manager.unload("snake.png");
-        manager.unload("buttons/startbutton.png");
-        manager.unload("buttons/selectlevels.png");
     }
     private void loading(){
         start=false;
@@ -171,15 +167,7 @@ public class Start implements Screen {
                 return;
             }if (load("snake.png",Texture.class)) {
                 return;
-            }if (load("buttons/startbutton.png",Texture.class)) {
-                return;
-            }if (load("buttons/selectlevels.png",Texture.class)) {
-                return;
-            }if (load("buttons/arcade.png",Texture.class)) {
-                return;
-            }if (load("buttons/settings.png",Texture.class)) {
-                return;
-            }if (load("buttons/newbuttons/buttons.atlas",TextureAtlas.class)) {
+            }if (load("buttons/startbuttons/startbuttons.atlas",TextureAtlas.class)) {
                 return;
             }
             loading();
@@ -210,11 +198,8 @@ public class Start implements Screen {
         background = manager.get("start.jpg", Texture.class);
         main = manager.get("snake.png", Texture.class);
         parts=new TextureRegion(main,132 ,62,53,64);
-        button=manager.get("buttons/startbutton.png");
 //        manager.get("buttons/selectlevels.png");
-        manager.get("buttons/settings.png");
-        manager.get("buttons/arcade.png");
-        manager.get("buttons/newbuttons/buttons.atlas");
+        manager.get("buttons/startbuttons/startbuttons.atlas");
 
         apple=new Image(new TextureRegion(main,0,190,59,66));
 //        apple.setBounds(350,400,100,100);

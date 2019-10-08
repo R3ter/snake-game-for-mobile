@@ -21,9 +21,10 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.Screens.GamePlay;
 import com.mygdx.game.Screens.WinScreen;
+import com.mygdx.game.enemies.Snake;
 
-public class Level3 extends GamePlay {
-    public Level3(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level) {
+public class Level5 extends GamePlay {
+    public Level5(SpriteBatch batch, AssetManager manager, MyGdxGame game,int level) {
         super(batch, manager, game);
         this.level=level;
     }
@@ -31,15 +32,19 @@ public class Level3 extends GamePlay {
     private StretchViewport viewport;
     private Stage stage;
     private TiledMap map;
+    private Snake evilsnake;
     private int level;
     private Texture rock;
     @Override
     public void show() {
         super.show();
+
         drawbackground=true;
-        steps=2;
+        steps=5;
         viewport=new StretchViewport(1400,400);
         stage=new Stage(viewport);
+
+        evilsnake=new Snake(batch,manager,array);
 
         viewport.apply();
         inputMultiplexer.addProcessor(stage);
@@ -52,19 +57,7 @@ public class Level3 extends GamePlay {
         super.loadingfinished();
 
         dialog();
-
-        renderer=new OrthogonalTiledMapRenderer(map);
-        MapLayer layer= map.getLayers().get(2);
-        MapObjects objects=layer.getObjects();
         grow=2;
-        renderer.setView(cam);
-
-        rock=manager.get("objects/rock.png");
-
-        for(MapObject t: objects){
-            RectangleMapObject rect = (RectangleMapObject) t;
-            rocks.add(new Vector2(rect.getRectangle().x,rect.getRectangle().y));
-        }
 
 
     }
@@ -73,7 +66,6 @@ public class Level3 extends GamePlay {
     @Override
     protected void drawfirst() {
         super.drawfirst();
-        renderer.render();
     }
 
     @Override
@@ -89,8 +81,14 @@ public class Level3 extends GamePlay {
             }if(load("buttons/dialog/winbuttons.atlas", TextureAtlas.class)){
                 return;
             }
+            evilsnake.load();
         }else{
-
+            if (evilsnake.array.contains(array.get(array.size()-1))){
+                restart();
+            }
+            if(start){
+                evilsnake.render();
+            }
             if(score>=10){
                 game.setScreen(new WinScreen(batch,manager,game,level));
             }
@@ -104,6 +102,7 @@ public class Level3 extends GamePlay {
     protected void initimages() {
         super.initimages();
         map=manager.get("maps/level3.tmx",TiledMap.class);
+        evilsnake.init();
     }
 
     private void dialog(){

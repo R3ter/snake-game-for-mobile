@@ -39,10 +39,10 @@ public class Level2 extends GamePlay {
     public void show() {
         super.show();
          drawbackground=true;
-         steps=5;
+         steps=1;
          viewport=new StretchViewport(1400,400);
          stage=new Stage(viewport);
-
+         wall.clear();
          viewport.apply();
          inputMultiplexer.addProcessor(stage);
     }
@@ -87,7 +87,6 @@ public class Level2 extends GamePlay {
                 return;
             }
         }else{
-            movesnake(2);
 
 
             stage.act(delta);

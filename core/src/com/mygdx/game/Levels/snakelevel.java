@@ -90,7 +90,7 @@ public class snakelevel extends GamePlay {
             }
             evilsnake.load();
         }else{
-            movesnake(2);
+
             if (evilsnake.array.contains(array.get(array.size()-1))){
                 restart();
             }
